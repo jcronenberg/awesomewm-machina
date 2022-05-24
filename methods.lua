@@ -16,7 +16,7 @@ local getlowest = helpers.getlowest
 local compare = helpers.compare
 local tablelength = helpers.tablelength
 local set_contains = helpers.set_contains
-local clear_tabbar = helpers.clear_tabbar
+--local clear_tabbar = helpers.clear_tabbar
 
 ---------------------------------------------------------------- locals -- ;
 
@@ -465,11 +465,11 @@ local function move_to(location)
 
          resize_region_to_index(is.region, is.region_geom, true)
 
-         draw_tabbar(is.region)
+         --draw_tabbar(is.region)
 
          gears.timer.delayed_call(function ()
             client.focus.region = tobe.region
-            draw_tabbar(tobe.region)
+            --draw_tabbar(tobe.region)
          end)
       end --| redraw tabs and update meta
 
@@ -609,7 +609,7 @@ local function expand_horizontal(direction)
 
          if not c.floating then
             resize_region_to_index(c.region, true, true)
-            draw_tabbar(c.region)
+            --draw_tabbar(c.region)
 
             gears.timer.weak_start_new(0.1,function ()
                client_under_mouse = mouse.current_client
@@ -704,8 +704,8 @@ local function expand_horizontal(direction)
             --|allow micky to move the mouse
             
             c:raise()
-            client.emit_signal("tabbar_draw", c.region)
-            clear_tabbar(c)
+            --client.emit_signal("tabbar_draw", c.region)
+            --clear_tabbar(c)
          end,c) --|give it time in case maximize_horizontal is
               --|adjusted before centering
          return
@@ -718,9 +718,10 @@ end
 
 ----------------------------------------------------- expand_vertical() -- ;
 
-local function expand_vertical()
+local function expand_vertical(direction)
+   return function()
    local c = client.focus
-   local going = "down"
+   local going = direction
 
    if c.maximized_vertical then 
       
@@ -778,6 +779,7 @@ local function expand_vertical()
    end)
 
    return
+   end
 end
 
 ------------------------------------------------------------- shuffle() -- ;
@@ -970,11 +972,11 @@ local function my_shifter(direction, swap)
          swapee:emit_signal("request::activate", "mouse_enter",{raise = true})
       end --|perform swap
 
-      draw_tabbar(target_region_ix)
+      --draw_tabbar(target_region_ix)
       resize_region_to_index(target_region_ix, target_region, true)
       --|update tabs in target region
       
-      draw_tabbar(client_region_ix)
+      --draw_tabbar(client_region_ix)
       resize_region_to_index(client_region_ix, source_region, true)
       --|update tabs in source region
    end   
@@ -1035,11 +1037,11 @@ local function shift_by_direction(direction, swap)
          swapee.region = client_region_ix
       end --|perform swap, update meta
 
-      draw_tabbar(target_region_ix)
+      --draw_tabbar(target_region_ix)
       resize_region_to_index(target_region_ix, target_region, true)
       --|update tabs in target region
       
-      draw_tabbar(client_region_ix)
+      --draw_tabbar(client_region_ix)
       resize_region_to_index(client_region_ix, source_region, true)
       --|update tabs in source region
    end
@@ -1096,58 +1098,58 @@ end --[23]
 
 -------------------------------------------------------- draw_tabbar() -- ;
 
-function draw_tabbar(region_ix, s)
-   local s = s or awful.screen.focused()
-   local flexlist = tabs.layout()
-   local tablist = get_tiled_clients(region_ix, s)
-   
-   if tablelength(tablist) == 0 then
-      return
-   end --|this should only fire on an empty region
-
-   if tablelength(tablist) == 1 then
-      clear_tabbar(tablist[1])
-      return
-   end --|reset tabbar titlebar when only
-       --|one client is in the region.
-
-   for cl_ix, cl in ipairs(tablist) do
-      local flexlist = tabs.layout()
-      global_widget_table[cl.window] = {}
-
-      for cc_ix, cc in ipairs(tablist) do
-         local buttons = gears.table.join(
-            awful.button({}, 1, function(_) 
-
-                double_click_event_handler(function()
-                    cc.floating = not cc.floating
-                end)
-
-               gears.timer.delayed_call(function(p) 
-                  client.emit_signal("riseup", p)
-               end, cc)
-            end),
-            awful.button({}, 3, function(_)
-               cc:kill()
-            end))
-
-         global_widget_table[cl.window][cc_ix] = tabs.create(cc, (cc == cl), buttons, cl_ix)
-         flexlist:add(global_widget_table[cl.window][cc_ix])
-         flexlist.max_widget_size = 120
-      end
-
-      local titlebar = awful.titlebar(cl, {
-         bg = tabs.bg_normal,
-         size = tabs.size,
-         position = tabs.position,
-      })
-
-      titlebar:setup{layout = wibox.layout.flex.horizontal, flexlist}
-      awful.titlebar(cl, {size=8, position = "top"})
-      awful.titlebar(cl, {size=0, position = "left"})
-      awful.titlebar(cl, {size=0, position = "right"})
-   end
-end
+--function draw_tabbar(region_ix, s)
+--   local s = s or awful.screen.focused()
+--   local flexlist = tabs.layout()
+--   local tablist = get_tiled_clients(region_ix, s)
+--   
+--   if tablelength(tablist) == 0 then
+--      return
+--   end --|this should only fire on an empty region
+--
+--   if tablelength(tablist) == 1 then
+--      clear_tabbar(tablist[1])
+--      return
+--   end --|reset tabbar titlebar when only
+--       --|one client is in the region.
+--
+--   for cl_ix, cl in ipairs(tablist) do
+--      local flexlist = tabs.layout()
+--      global_widget_table[cl.window] = {}
+--
+--      for cc_ix, cc in ipairs(tablist) do
+--         local buttons = gears.table.join(
+--            awful.button({}, 1, function(_) 
+--
+--                double_click_event_handler(function()
+--                    cc.floating = not cc.floating
+--                end)
+--
+--               gears.timer.delayed_call(function(p) 
+--                  client.emit_signal("riseup", p)
+--               end, cc)
+--            end),
+--            awful.button({}, 3, function(_)
+--               cc:kill()
+--            end))
+--
+--         global_widget_table[cl.window][cc_ix] = tabs.create(cc, (cc == cl), buttons, cl_ix)
+--         flexlist:add(global_widget_table[cl.window][cc_ix])
+--         flexlist.max_widget_size = 120
+--      end
+--
+--      local titlebar = awful.titlebar(cl, {
+--         bg = tabs.bg_normal,
+--         size = tabs.size,
+--         position = tabs.position,
+--      })
+--
+--      titlebar:setup{layout = wibox.layout.flex.horizontal, flexlist}
+--      awful.titlebar(cl, {size=8, position = "top"})
+--      awful.titlebar(cl, {size=0, position = "left"})
+--      awful.titlebar(cl, {size=0, position = "right"})
+--   end
+--end
 
 ------------------------------------------------------ resize_region_to -- ;
 
@@ -1220,8 +1222,8 @@ local function teleport_client(c,s)
          region=get_client_info(c).active_region,
       }
       c.region = tobe.region
-      draw_tabbar(c.region, c.screen)
-      draw_tabbar(is.region, is.screen)
+      --draw_tabbar(c.region, c.screen)
+      --draw_tabbar(is.region, is.screen)
       c:emit_signal("request::activate", "mouse_enter",{raise = true})
    end,c)
 end
@@ -1244,7 +1246,7 @@ local function manage_signal(c)
          gears.timer.delayed_call(function(cinfo, p)
             if p.data.awful_client_properties then --[20]
                p.region = cinfo.region
-               draw_tabbar(cinfo.active_region, p.screen)
+               --draw_tabbar(cinfo.active_region, p.screen)
                p:geometry(cinfo.active_region_geom)
             end
          end, ci, c)
@@ -1274,7 +1276,7 @@ local function unmanage_signal(c)
       if not c.floating then
          local ci = get_client_info(c)
          if ci.active_region then 
-            draw_tabbar(ci.active_region, c.screen)
+            --draw_tabbar(ci.active_region, c.screen)
          end
       end
    end
@@ -1287,7 +1289,7 @@ local function selected_tag_signal(t)
       local regions = get_regions(t.screen)
          if regions and #regions then
             for i, region in ipairs(regions) do
-               draw_tabbar(i, t.screen)
+               --draw_tabbar(i, t.screen)
             end
          end
    end,t)
@@ -1304,8 +1306,8 @@ local function floating_signal(c)
    if c.floating then
       if c.region then
          gears.timer.delayed_call(function(active_region,c)
-            clear_tabbar(c)
-            draw_tabbar(c.region)
+            --clear_tabbar(c)
+            --draw_tabbar(c.region)
             c.region = nil
          end, active_region,c)
       end
@@ -1316,7 +1318,7 @@ local function floating_signal(c)
       if ci.active_region then
          c.region = ci.active_region
          gears.timer.delayed_call(function(active_region)
-            draw_tabbar(active_region)
+            --draw_tabbar(active_region)
          end, ci.active_region)
       end
    end --|window became tiled
@@ -1391,7 +1393,7 @@ client.connect_signal("focus", focus_signal)
 client.connect_signal("unfocus", unfocus_signal)
 client.connect_signal("property::minimized", minimized_signal)
 client.connect_signal("property::floating", floating_signal)
-client.connect_signal("tabbar_draw", draw_tabbar)
+--client.connect_signal("tabbar_draw", draw_tabbar)
 client.connect_signal("unmanage", unmanage_signal) 
 client.connect_signal("manage", manage_signal)
 tag.connect_signal("property::selected", selected_tag_signal)
@@ -1414,7 +1416,7 @@ module = {
    move_to = move_to,
    get_regions = get_regions,
    toggle_always_on = toggle_always_on,
-   draw_tabbar = draw_tabbar,
+   --draw_tabbar = draw_tabbar,
    get_global_clients = get_global_clients,
    update_global_clients = update_global_clients,
    get_client_info = get_client_info,

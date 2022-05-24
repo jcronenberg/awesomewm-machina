@@ -33,14 +33,14 @@ end --|
     --|global_client_index. keeping it here for historical
     --|reasons in case we need this again.
 
-local function clear_tabbar(c, position)
-   if not c then return end
-   local position = position or "bottom"
-   local titlebar = awful.titlebar(c, {size=3, position=position})
-   titlebar:setup{
-      layout=wibox.layout.flex.horizontal, nil
-   }
-end --|clears bottom tabbar
+--local function clear_tabbar(c, position)
+--   if not c then return end
+--   local position = position or "bottom"
+--   local titlebar = awful.titlebar(c, {size=3, position=position})
+--   titlebar:setup{
+--      layout=wibox.layout.flex.horizontal, nil
+--   }
+--end --|clears bottom tabbar
 
 local function reload(m)
   if package.loaded[m] then
@@ -103,5 +103,5 @@ return {
     getlowest = getlowest,
     get_client_ix = get_client_ix,
     reload = reload,
-    clear_tabbar = clear_tabbar
+    --clear_tabbar = clear_tabbar
 }
